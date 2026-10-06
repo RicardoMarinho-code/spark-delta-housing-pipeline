@@ -1,0 +1,58 @@
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# secrets: never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# data (synthetic, generated locally) and artifacts
+data/
+dados/
+mlruns/
+mlflow.db
+spark-warehouse/
+metastore_db/
+derby.log
+*.log
+.ipynb_checkpoints/
+
+# loose data files: real data never enters the repository
+*.TXT
+*.txt
+*.csv
+*.parquet
+!requirements*.txt
+
+# terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate*
+infra/terraform/*.tfplan
+infra/terraform/*.tfvars
+!infra/terraform/example.tfvars
+infra/terraform/backend.hcl
+
+# local Airflow
+airflow.cfg
+airflow.db
+logs/
+
+# editors and OS
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini

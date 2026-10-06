@@ -1,0 +1,64 @@
+# Pipeline configuration. Paths may be local or ADLS URIs (abfss://...).
+# HOUSING_INPUT and HOUSING_LAKEHOUSE override the paths.
+input_path: data/input
+lakehouse_path: data/lakehouse
+
+sources:
+  cadunico_family:
+    pattern: "ARQ_FAMILIA_*.TXT"
+    separator: ";"
+    encoding: ISO-8859-1
+    kind: snapshot          # dated monthly file (DDMMYYYY in the name), one bronze partition per month
+  cadunico_person:
+    pattern: "ARQ_PESSOA_*.TXT"
+    separator: ";"
+    encoding: ISO-8859-1
+    kind: snapshot
+  mcmv_beneficiaries:
+    pattern: "BENEFICIARIOS_MCMV_*.csv"
+    separator: ";"
+    encoding: UTF-8
+    kind: snapshot
+  ref_municipalities:
+    pattern: "MUNICIPIOS.csv"
+    separator: ";"
+    encoding: UTF-8
+    kind: reference         # public reference table, overwritten on each load
+  ref_fjp_deficit:
+    pattern: "DEFICIT_FJP.csv"
+    separator: ";"
+    encoding: UTF-8
+    kind: reference
+
+quality:
+  max_rejection_rate: 0.05      # above this the load stops before publishing to silver
+  max_volume_change: 0.20       # alert when volume deviates more than this from the recent median
+  max_days_without_load: 45     # freshness alert (CadÚnico is monthly)
+
+privacy:
+  bronze_retention_months: 3    # raw data with identifiers is deleted after this period
+  min_cell_size: 5              # counts below this are suppressed when publishing
+
+mcmv:
+  # Monthly gross household income ceiling per band (urban). Check the current regulation.
+  income_bands:
+    1: 2850
+    2: 4700
+    3: 8600
+    4: 12000
+
+allocation:
+  budget: 2000000000
+  execution_cap: 0.30           # at most 30% of a municipality's forecast deficit per cycle
+  min_region_share: 0.80        # each region gets at least 80% of its deficit-proportional share
+  # Average cost per housing unit (BRL). Illustrative values.
+  unit_cost_by_region:
+    North: 175000
+    Northeast: 160000
+    Southeast: 195000
+    South: 185000
+    Center-West: 175000
+
+publishing:
+  mongo_database: housing
+  mongo_collection: municipality_profiles

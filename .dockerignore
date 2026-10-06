@@ -1,0 +1,9 @@
+.venv
+.git
+data
+dados
+mlruns
+**/__pycache__
+.pytest_cache
+.ruff_cache
+infra/terraform/.terraform
