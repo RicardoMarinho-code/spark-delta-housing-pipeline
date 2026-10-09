@@ -20,7 +20,8 @@ def test_splits_quarantine_and_counts_per_rule(spark):
         assert result.quarantined == 3
         assert sorted(r.id for r in result.valid.collect()) == [1, 5]
         failures = {m["rule"]: m["failures"] for m in result.metrics}
-        assert failures == {"id_present": 1, "income_non_negative": 2, "income_high": 3}
+        # income_high fails for 1000 and for the null income (null counts as a failure)
+        assert failures == {"id_present": 1, "income_non_negative": 2, "income_high": 2}
         assert result.valid.where("id = 5").first()["_warnings"] == ["income_high"]
         reasons = {r.id: r._failures for r in result.quarantine.collect()}
         assert reasons[2] == ["income_non_negative"]
